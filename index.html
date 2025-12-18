@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Моніторинг температури (WebSocket)</title>
+
+  <style>
+    body { 
+      font-family: Arial; 
+      max-width: 600px; 
+      margin: 40px auto; 
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 25px;
+      border-radius: 8px;
+    }
+
+    #value {
+      font-size: 60px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    #warning {
+      font-size: 20px; 
+      font-weight: bold;
+      color: red;
+      margin-top: 10px;
+    }
+
+    input {
+      font-size: 18px;
+      width: 60px;
+      padding: 3px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Моніторинг температури (WebSocket)</h1>
+
+<div class="box">
+
+  <label>Поріг температури:
+    <input id="limit" type="number" value="30" />
+    °C
+  </label>
+
+  <div id="value">Підключення...</div>
+
+  <div id="warning"></div>
+
+</div>
+
+<script>
+  const socket = new WebSocket("ws://localhost:8080");
+
+  const valueDiv = document.getElementById("value");
+  const warnDiv = document.getElementById("warning");
+  const limitInput = document.getElementById("limit");
+
+  socket.onmessage = (event) => {
+    const temp = parseFloat(event.data);
+    const limit = parseFloat(limitInput.value);
+
+    valueDiv.textContent = temp + " °C";
+
+    if (temp > limit) {
+      warnDiv.textContent = "⚠ Температура перевищує норму!";
+    } else {
+      warnDiv.textContent = "";
+    }
+  };
+</script>
+
+</body>
+</html>
